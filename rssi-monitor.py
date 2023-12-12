@@ -1,3 +1,4 @@
+
 import bluetooth
 import time
 
@@ -73,4 +74,4 @@ if __name__ == "__main__":
                 # Sleep for a while before scanning again
                 time.sleep(5)
             else:
-                break
+                break 
