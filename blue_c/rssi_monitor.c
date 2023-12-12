@@ -13,7 +13,7 @@ Flow
 6. If the user chooses a device, the target address is set based on the user's choice.
 7. Within an inner loop, the program performs another Bluetooth device inquiry to check if the target device is still in range.
 8. If the target device is found, the program executes a system command to get the RSSI (Received Signal Strength Indication) value of the device.
-9. The program then waits for a delay before repeating the process.
+9. The RSSI is then converted into distance using the "log-distance path loss model" method and printed to the output console.
 
 Outputs
 The program prints the available devices with their MAC addresses and names. If the user chooses a device, the program executes a system command to get the RSSI value of the device.
@@ -42,9 +42,9 @@ int find_device(const char* target_addr, inquiry_info* devices, int num_devices)
 }
 
 double rssiToDistance(int rssi) {
-  double n = 2;
-  double mp = -69;
-  return round(pow(10, ((mp - (double)rssi) / (10 * n))) * 100) / 100;
+    double n = 2;
+    double mp = -69;
+    return round(pow(10, ((mp - (double)rssi) / (10 * n))) * 100) / 100;
 }
 
 int main() {
