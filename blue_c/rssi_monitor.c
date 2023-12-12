@@ -26,6 +26,7 @@ The program prints the available devices with their MAC addresses and names. If 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
+#include <math.h>
 
 #define MAX_DEVICES 10
 
@@ -38,6 +39,12 @@ int find_device(const char* target_addr, inquiry_info* devices, int num_devices)
         }
     }
     return -1;  // Device not found
+}
+
+double rssiToDistance(int rssi) {
+  double n = 2;
+  double mp = -69;
+  return round(pow(10, ((mp - (double)rssi) / (10 * n))) * 100) / 100;
 }
 
 int main() {
@@ -136,7 +143,8 @@ int main() {
             }
 
             while (fgets(output, sizeof(output) - 1, fp) != NULL) {
-                printf("%s", output);
+                int rssi = atoi(output);
+                printf("Distance: %.2lf meters at %d RSSI\n", rssiToDistance(rssi), rssi);
             }
 
             pclose(fp);
