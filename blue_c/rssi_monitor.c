@@ -48,7 +48,7 @@ int main() {
         printf("Scanning for nearby Bluetooth devices...\n");
 
         // Allocate memory for the inquiry_info array
-        devices = (inquiry_info *)malloc(MAX_DEVICES * sizeof(inquiry_info));
+        devices = (inquiry_info *)calloc(MAX_DEVICES, sizeof(inquiry_info));
         if (devices == NULL) {
             perror("Failed to allocate memory");
             exit(1);
@@ -121,10 +121,25 @@ int main() {
             }
 
             // Get RSSI
-
             char command[256];
             sprintf(command, "sudo btmgmt find | grep \"%s\" | awk '{print $7}'", target_addr);
-            system(command);
+            // system(command);
+
+            FILE *fp;
+            char output[256];
+
+            fp = popen(command, "r");
+
+            if (fp == NULL) {
+                perror("Failed to run command");
+                exit(1);
+            }
+
+            while (fgets(output, sizeof(output) - 1, fp) != NULL) {
+                printf("%s", output);
+            }
+
+            pclose(fp);
         }
     }
 
