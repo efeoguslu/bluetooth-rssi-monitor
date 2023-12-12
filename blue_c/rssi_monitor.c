@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -100,11 +101,16 @@ int main() {
             }
 
             // Get RSSI
-            inquiry_info_with_rssi *ir = (inquiry_info_with_rssi*)(&(devices[target_index]));
-            printf("RSSI: %d dBm\n", ir->rssi);
+            // inquiry_info_with_rssi *ir = (inquiry_info_with_rssi*)(&(devices[target_index]));
+            // printf("RSSI: %d dBm\n", ir->rssi);
 
             // Delay between RSSI readings
-            sleep(1);
+
+            char command[256];
+            sprintf(command, "sudo btmgmt find | grep \"%s\" | awk '{print $7}'", target_addr);
+            system(command);
+
+            // sleep(1);
         }
     }
 
@@ -112,3 +118,4 @@ int main() {
     free(devices);  // Free the allocated memory
     return 0;
 }
+
