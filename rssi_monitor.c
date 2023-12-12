@@ -32,6 +32,30 @@ It also prints the distance according to the RSSI value.
 
 #define MAX_DEVICES 10
 
+int past_rssi[10];
+
+double moving_average_filter(int rssi) {
+
+   for(int i = 0; i < 9; ++i){
+        past_rssi[i] = rssi;
+   }
+
+   double sum = 0;
+
+   // Shift the old values
+   for (int i = 0; i < 9; i++) {
+       past_rssi[i] = past_rssi[i + 1];
+       sum += past_rssi[i];
+   }
+
+   // Add the new value
+   past_rssi[9] = rssi;
+   sum += rssi;
+
+   // Calculate the moving average
+   return sum / 10;
+}
+
 int find_device(const char* target_addr, inquiry_info* devices, int num_devices) {
     for (int i = 0; i < num_devices; i++) {
         char addr[19] = { 0 };
@@ -44,8 +68,8 @@ int find_device(const char* target_addr, inquiry_info* devices, int num_devices)
 }
 
 double rssiToDistance(int rssi) {
-    double n = 2;
-    double mp = -69;
+    double n = 2.5;
+    double mp = -50;
     return round(pow(10, ((mp - (double)rssi) / (10 * n))) * 100) / 100;
 }
 
@@ -146,9 +170,10 @@ int main() {
 
             while (fgets(output, sizeof(output) - 1, fp) != NULL) {
                 int rssi = atoi(output);
-                printf("Distance: %.2lf meters at %d RSSI\n", rssiToDistance(rssi), rssi);
+                int filtered_rssi = moving_average_filter(rssi);
+                printf("Distance: %.2lf meters at %d RSSI\n", rssiToDistance(filtered_rssi), filtered_rssi);
+                sleep(1);
             }
-
             pclose(fp);
         }
     }
